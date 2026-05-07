@@ -2,6 +2,11 @@
 
 > Last updated: YYYY-MM-DD
 > Current version: `v0.1.0`
+>
+> **This file contains only approved, implementation-ready features.**
+> New ideas, scope expansion, and product-level decisions go to `docs/project-brief.md` → `docs/milestones.md` first. Phase 0 in `PROJECT_PROTOCOL.md` prohibits adding entries here until the brief is approved and the feature belongs to an approved milestone.
+>
+> Each `vX.Y.0` entry below must reference a milestone (`M1`, `M2`, ...) defined in `docs/milestones.md`.
 
 ---
 
@@ -14,6 +19,7 @@ See `docs/ai-collaboration.md` for the Haiku → Sonnet → Human pipeline these
 
 ### vX.Y.0 — [Feature Name]
 
+**Milestone**: `M1` (see `docs/milestones.md`)
 **Lead**: `[Haiku]` / `[Sonnet]` / `[Opus]` / `[Me]` / `[Together]`
 **Goal**: [One sentence — what ships and what it enables for the user]
 **Risk**: Low / Medium / High — [reason]
@@ -51,6 +57,7 @@ See `docs/ai-collaboration.md` for the Haiku → Sonnet → Human pipeline these
 
 ### vX.Z.0 — [Feature Name]
 
+**Milestone**: `M1` (see `docs/milestones.md`)
 **Lead**: `[Haiku]`
 **Goal**: [One sentence]
 **Risk**: Low / Medium / High — [reason]
