@@ -27,13 +27,14 @@ git pull origin $(git branch --show-current)
 
 Then read in this order:
 
-1. `AI_HANDOFF.md` — your briefing. This tells you what's in progress and exactly what to do.
-2. `git log --oneline -10` — see recent history
-3. `git diff HEAD~1` — see the last committed change
-4. `CLAUDE.md` — app context (if not already read this session)
-5. `docs/overview.md` — what this app is (if not already read this session)
+1. `git log --oneline -10` — recent history. The most recent commit message is your briefing.
+2. `git diff HEAD~1` — the last committed change in detail.
+3. `gh issue list --state open --limit 10` — what's in flight, what's blocked. The roadmap entry for the current feature is also linked from issues when escalation is open.
+4. `docs/roadmap.md` — current feature's `**Status**` and `**Pass Count**` fields tell you the pipeline stage and how many Sonnet passes have run.
+5. `CLAUDE.md` — app context (if not already read this session).
+6. `docs/overview.md` — what this app is (if not already read this session).
 
-**Do not start work until you have read AI_HANDOFF.md.**
+**Do not start work until you understand what the previous model shipped and what the roadmap says is next.**
 
 ---
 
@@ -41,11 +42,12 @@ Then read in this order:
 
 Before you stop or pass to the next model:
 
-1. Update `AI_HANDOFF.md` — fill every field. This is how the next model picks up cold.
-2. Stage and commit all changes including `AI_HANDOFF.md`
-3. Push to branch
+1. Commit with a message clear enough that the next model can pick up from `git log -5` alone — what shipped, what's left, blocker if any.
+2. Update the roadmap entry's `**Status**` and `**Pass Count**` fields if the feature moved through the pipeline.
+3. If escalating, file or comment on a GitHub issue with the exact problem, error, and what was tried.
+4. Push to branch.
 
-The next model will not ask you what happened. It will read the file.
+The next model will not ask you what happened. It will read `git log`, the open issues, and the roadmap entry.
 
 ---
 
@@ -60,7 +62,7 @@ Human (+ AI tool of choice) → write full feature spec (roadmap, 15 features pl
   ↓
 Haiku → implements the ENTIRE feature in one session (all tasks, all files)
   ↓
-Haiku → commits, pushes, updates AI_HANDOFF.md
+Haiku → commits with a clear message, pushes, updates roadmap entry status
   ↓
 Sonnet → reviews full output, fixes what Haiku got wrong, iterates with human (max 5 passes)
   ↓
@@ -88,19 +90,19 @@ Done → Haiku picks up next feature
 |------|--------|
 | 1–3 | Sonnet iterates independently, no human needed |
 | 4 | Sonnet flags one specific question to human before continuing |
-| 5 | If still unresolved → escalate to Opus, document exact blocker in AI_HANDOFF.md |
+| 5 | If still unresolved → escalate to Opus, file an issue with the exact blocker |
 
-Pass count is tracked in `AI_HANDOFF.md → Pass Count (Sonnet)`.
+Pass count is tracked in the roadmap entry's `**Pass Count**` field. Increment it on each commit during the Sonnet review phase.
 
 ### Escalation
 
 When Sonnet hits pass 5:
-1. Set `AI_HANDOFF.md → Current Status` to `[escalated-opus]`
-2. Write the exact problem, error, and what was tried in `AI_HANDOFF.md → Blocker`
-3. Commit and push
-4. Human opens Opus terminal — Opus reads AI_HANDOFF.md and picks up
+1. Set the roadmap entry's `**Status**` to `[escalated]`.
+2. File a GitHub issue with the exact problem, error, and what was tried. Link the roadmap entry. Label `escalation` or similar so it's findable.
+3. Commit (message includes the issue number) and push.
+4. Human opens Opus terminal — Opus reads `git log`, the open issues, and the roadmap entry, then picks up.
 
-After Opus resolves (or decides it can't): human chooses to either ship the fix or defer the feature and move to the next item in the roadmap.
+After Opus resolves (or decides it can't): human chooses to either ship the fix or defer the feature and move to the next item in the roadmap. Close the escalation issue with the resolution.
 
 ---
 
@@ -140,7 +142,7 @@ A feature spec is written well enough for Haiku when:
 - **Every output is described exactly** — what the user sees, what the API returns, what gets written to the DB
 - **No architecture decisions are left open** — Haiku executes, it does not design. If a decision is unresolved, Cursor + Sonnet resolves it in the spec before Haiku touches code.
 
-**When Haiku gets stuck**: if Haiku hits something that requires a judgment call not covered by the spec, it should stop, document what it built so far, note the exact question in `AI_HANDOFF.md → Blocker`, and hand off to Sonnet. This is not a failure — it means the spec had a gap that Cursor + Sonnet needs to fill for next time.
+**When Haiku gets stuck**: if Haiku hits something that requires a judgment call not covered by the spec, it should stop, commit what it built so far with a clear message describing the blocker, file an issue with the exact question, and hand off to Sonnet. This is not a failure — it means the spec had a gap that Cursor + Sonnet needs to fill for next time.
 
 A Haiku task that requires judgment is a poorly written spec, not a Haiku limitation.
 
@@ -208,27 +210,24 @@ If a pattern isn't in these docs, it hasn't been standardized. Escalate to Sonne
 
 ---
 
-## What Goes in AI_HANDOFF.md
+## Cross-Session State
 
-`AI_HANDOFF.md` is the **only** cross-session state file. It is always committed. It is always current. The human never writes it — the model does at session end.
+There is no per-repo handoff file. State lives in three places, each with a clear job:
 
-Fields:
-- **Current Feature** — version + name
-- **Current Status** — one of the pipeline stages
-- **Last Model** — who wrote this handoff
-- **Next Model** — who picks up and why
-- **Pass Count** — Sonnet review iteration count
-- **What Was Done** — 2–4 bullets, specific
-- **What To Do Next** — specific enough that a fresh cold-start model needs nothing else
-- **Files Changed This Feature** — path + one-line description
-- **Blocker** — exact error or problem if stuck, empty if not
+| Source | What it carries | Updated by |
+|--------|-----------------|------------|
+| `git log` | What shipped, what's left, what's blocked. The most recent commit message is the briefing for the next model. | Every commit |
+| GitHub issues | Open work, escalations, blockers with full context (problem, error, what was tried) | When work is filed, escalated, or resolved |
+| `docs/roadmap.md` entry | Pipeline stage (`**Status**`) and review iteration count (`**Pass Count**`) for the current feature | At each pipeline transition |
+
+A model that needs to pick up cold reads `git log -10`, `gh issue list --state open`, and the active roadmap entry — in that order — and has everything it needs.
 
 ---
 
 ## Rules
 
-- Never start a session without reading `AI_HANDOFF.md` first.
-- Never end a session without updating `AI_HANDOFF.md` and pushing.
+- Never start a session without reading the recent commits and open issues first.
+- Never end a session without a commit message that tells the next model what happened and what's next.
 - Haiku does not make architecture decisions. If it needs to, stop and flag it.
 - Sonnet does not escalate before pass 3 without a specific reason.
 - Opus is not for normal work. If Opus is being used for routine tasks, something upstream broke down.

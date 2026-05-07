@@ -15,6 +15,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 
 ### Removed
 - **`sync.sh`**: Manual cross-repo sync script retired — superseded by the GitHub Action sync workflow
+- **`AI_HANDOFF.md`**: Per-repo handoff file retired. Cross-session state now lives in `git log`, GitHub issues, and the roadmap entry's `**Status**` / `**Pass Count**` fields. Pattern was retired in agent-gracie-law after the file accumulated into a 350KB blob no agent read end-to-end. References removed from `CLAUDE.md`, `PROJECT_PROTOCOL.md`, `README.md`, and `docs/ai-collaboration.md`.
 
 ## [1.3.0] - 2026-04-07
 ### Changed

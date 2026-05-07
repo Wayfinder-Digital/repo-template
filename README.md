@@ -42,8 +42,8 @@ Here is what I'm building:
 [describe your app — what it does, who uses it, what problem it solves]
 
 Please do the following:
-1. Read CLAUDE.md, docs/overview.md, and AI_HANDOFF.md so you understand the
-   template structure.
+1. Read CLAUDE.md, PROJECT_PROTOCOL.md, and docs/overview.md so you understand
+   the template structure.
 2. Fill in CLAUDE.md completely — app name, one-liner, database schema (ask me
    for table names and columns), API routes, auth flow, environment URLs, and
    any known gotchas I mention.
@@ -60,7 +60,7 @@ invent schema, routes, or features — ask first.
 
 ### Every session after that
 
-Your agent reads `PROJECT_PROTOCOL.md` automatically (it's in `CLAUDE.md` at the top). The boot sequence tells it to read `AI_HANDOFF.md` → recent git log → `CLAUDE.md` → `docs/overview.md` before touching anything. No prompt needed — the protocol handles it.
+Your agent reads `PROJECT_PROTOCOL.md` automatically (it's in `CLAUDE.md` at the top). The boot sequence tells it to read recent git log → open GitHub issues → `CLAUDE.md` → `docs/overview.md` → roadmap entry before touching anything. No prompt needed — the protocol handles it.
 
 If you're using Cursor, add `PROJECT_PROTOCOL.md` as a [Cursor Rule](https://docs.cursor.com/context/rules-for-ai) so it's always in context.
 
@@ -81,7 +81,6 @@ If you're using Cursor, add `PROJECT_PROTOCOL.md` as a [Cursor Rule](https://doc
 | `docs/spec-writing-guide.md` | How to write Haiku-ready feature specs | No |
 | `docs/secrets.md` | Secret management and rotation procedures | Yes |
 | `docs/migration-waves.md` | n8n → Hono migration planning template | No |
-| `AI_HANDOFF.md` | Live cross-session state file for AI models | No |
 | `.env.example` | Environment variable template | No |
 | `.github/sync-config.json` | Sync targets — update with your repos | No |
 

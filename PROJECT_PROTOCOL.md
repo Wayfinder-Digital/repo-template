@@ -10,21 +10,22 @@ This document governs every Claude Code session on this repo. Read it first. Fol
 
 ## Boot Sequence
 
-At the start of every session, read the following files in this order:
+At the start of every session, read the following in this order:
 
 1. `PROJECT_PROTOCOL.md` (this file)
-2. `AI_HANDOFF.md` — **read this first before anything else**. Current feature, status, and exactly what to do next.
-3. `git log --oneline -10` — recent history
-4. `git diff HEAD~1` — last committed change
+2. `git log --oneline -10` — recent history
+3. `git diff HEAD~1` — last committed change
+4. `gh issue list --state open --limit 10` — what's in flight, what's blocked, what was filed since the last session
 5. `CLAUDE.md` — app-specific context, schema, APIs, migration status
 6. `docs/overview.md` — what this app is and why it exists
 7. `docs/decisions.md` — lessons learned, problems solved, things that don't work
+8. `docs/roadmap.md` — current feature in progress (status field tells you the pipeline stage and pass count)
 
 **For migration sessions**, also read:
-8. `docs/migration-checklist.md` — step-by-step process
-9. `docs/migration-waves.md` — wave order, dependencies, blockers
+9. `docs/migration-checklist.md` — step-by-step process
+10. `docs/migration-waves.md` — wave order, dependencies, blockers
 
-Do not begin work until `AI_HANDOFF.md` has been read.
+Cross-session state lives in `git log`, the issue tracker, and the roadmap entry's `**Status**` / `**Pass Count**` fields — there is no separate handoff file.
 
 > Multiple models may be running concurrently in separate terminals on the same branch. See `docs/ai-collaboration.md` for the full pipeline.
 
@@ -126,11 +127,12 @@ The standard Phase 0–3 gates apply, with these migration-specific additions:
 
 Before ending any session:
 
-1. Update `AI_HANDOFF.md` — fill every field. Set `Next Model` and `What To Do Next` clearly.
-2. Commit all changes including `AI_HANDOFF.md`
-3. Push to branch
+1. Commit with a clear message that explains what shipped, what's left, and any blocker. Imagine the next model reading only `git log -5` — give it enough to pick up cold.
+2. Update the roadmap entry's `**Status**` and `**Pass Count**` fields if the feature changed pipeline stage.
+3. If escalating or handing off mid-feature, file or update a GitHub issue describing the exact blocker, what was tried, and what to try next.
+4. Push to branch.
 
-The next model — whether Haiku, Sonnet, or Opus — will read `AI_HANDOFF.md` cold. Write it accordingly.
+The next model — whether Haiku, Sonnet, or Opus — will read `git log`, the open issues, and the roadmap entry cold. Make those three sources sufficient.
 
 ---
 
@@ -140,5 +142,5 @@ The next model — whether Haiku, Sonnet, or Opus — will read `AI_HANDOFF.md` 
 - If you're about to make a change that touches more than 3 files, pause and confirm.
 - When in doubt, ask. Don't guess.
 - Write decisions and lessons learned to `docs/decisions.md` when we solve a hard problem.
-- Never start a session without reading `AI_HANDOFF.md` first.
-- Never end a session without updating `AI_HANDOFF.md` and pushing.
+- Never start a session without reading the recent commits and open issues first.
+- Never end a session without a commit message that tells the next model what happened and what's next.
