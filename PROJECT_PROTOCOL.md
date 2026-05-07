@@ -18,12 +18,14 @@ At the start of every session, read the following in this order:
 4. `gh issue list --state open --limit 10` — what's in flight, what's blocked, what was filed since the last session
 5. `CLAUDE.md` — app-specific context, schema, APIs, migration status
 6. `docs/overview.md` — what this app is and why it exists
-7. `docs/decisions.md` — lessons learned, problems solved, things that don't work
-8. `docs/roadmap.md` — current feature in progress (status field tells you the pipeline stage and pass count)
+7. `docs/project-brief.md` — Phase Zero artifact. Confirms scope, boundaries, and isolation tests are locked. **If not approved, you are in Phase 0 — see Phase Gates below.**
+8. `docs/milestones.md` — current milestone in flight. Maps brief scope to roadmap entries.
+9. `docs/decisions.md` — lessons learned, problems solved, things that don't work
+10. `docs/roadmap.md` — current feature in progress (status field tells you the pipeline stage and pass count)
 
 **For migration sessions**, also read:
-9. `docs/migration-checklist.md` — step-by-step process
-10. `docs/migration-waves.md` — wave order, dependencies, blockers
+11. `docs/migration-checklist.md` — step-by-step process
+12. `docs/migration-waves.md` — wave order, dependencies, blockers
 
 Cross-session state lives in `git log`, the issue tracker, and the roadmap entry's `**Status**` / `**Pass Count**` fields — there is no separate handoff file.
 
@@ -33,15 +35,49 @@ Cross-session state lives in `git log`, the issue tracker, and the roadmap entry
 
 ## Phase Gates
 
-Every task moves through four phases. Do not skip phases. Do not advance without sign-off.
+Every task moves through five phases. Do not skip phases. Do not advance without sign-off.
 
-### Phase 0: Discover
+> **Where the gate applies**: Phase 0 (Brief) and Phase 0.5 (Milestones) are required for **new repos** created from this template, and for **existing repos starting new major scope** — a v2.0, a new milestone, a product pivot. They are *not* required retroactively for repos already past v0.1 with established roadmap entries.
+>
+> Once a brief and at least one milestone exist and are approved, day-to-day feature work proceeds through Phase 1 → 2 → 3 as before. The brief gate is for product-level decisions, not every commit.
 
-- What are we building or fixing?
-- Does it touch anything that already works?
-- **Integration Risk Check**: Will this change affect any external API, webhook, database schema, or upstream/downstream dependency? If yes, document the risk before proceeding.
+### Phase 0: Brief
 
-**Sign-off phrase**: "Scope is locked."
+The Phase Zero gate exists to prevent agents from jumping into roadmap entries, GitHub issues, or code before the product, constraints, boundaries, architecture sketch, and smallest useful version are locked.
+
+**Until `docs/project-brief.md` is approved (Status checkbox checked, dated, signed), no agent may**:
+
+- Add or modify entries in `docs/roadmap.md`
+- File or modify GitHub issues for the project
+- Write or modify any source code
+- Make architecture decisions outside `docs/project-brief.md`
+
+**For new repos** created from this template:
+
+1. Read the `docs/project-brief.md` template fields.
+2. Fill it in via Phase 0 conversation with the owner — every field, every section.
+3. Resolve every "Open questions" item. Unresolved questions either get answers or move to *Boundaries — OUT of scope* with a deferral reason.
+4. Owner reviews; checks the **Approved** box with date and name.
+5. Only then proceed to Phase 0.5.
+
+**For existing repos taking on new major scope** (v2.0, new milestone, pivot):
+
+1. Branch the brief: `docs/project-brief-vN.md` (e.g., `docs/project-brief-v2.md`).
+2. Same gate — fill, review, approve.
+3. The original `docs/project-brief.md` stays as the historical record of the prior approved scope.
+
+**Sign-off phrase**: "Brief is approved."
+
+### Phase 0.5: Milestones
+
+After brief approval, before any roadmap entries are written:
+
+- Group brief scope into milestones in `docs/milestones.md`.
+- Each milestone references the brief scope item(s) it fulfills.
+- Each milestone's done criteria reference brief boundary contracts, isolation tests, and integration risks for the components it touches.
+- Owner reviews and approves the milestone breakdown.
+
+**Sign-off phrase**: "Milestones are approved."
 
 ### Phase 1: Map
 
@@ -55,6 +91,7 @@ Every task moves through four phases. Do not skip phases. Do not advance without
 
 - Write out the specific changes to be made.
 - Identify what could break.
+- If this feature introduces a new integration risk not in the brief's *Integration risks* table, the brief must be updated and re-approved before code starts.
 - If anything on the critical path depends on a third-party API, flag it. No uncontrolled third-party APIs on the critical ingestion path.
 
 **Sign-off phrase**: "Plan is approved."
@@ -112,11 +149,12 @@ If the answer to any of these is NO, refactor before building further.
 
 ### Migration phase gates
 
-The standard Phase 0–3 gates apply, with these migration-specific additions:
+A migration to v2.0 is "new major scope" — Phase 0 (Brief) and Phase 0.5 (Milestones) apply via a branched brief (`docs/project-brief-v2.md`). The standard Phase 0–3 gates apply, with these migration-specific additions:
 
 | Phase | Migration addition |
 |-------|-------------------|
-| Phase 0 (Discover) | List all n8n workflows and their IDs. Audit git history for secrets. |
+| Phase 0 (Brief) | Branch as `docs/project-brief-v2.md`. List all n8n workflows and their IDs. Audit git history for secrets. Boundary contracts must include the old n8n route and the new Hono route side by side during the parallel-testing window. |
+| Phase 0.5 (Milestones) | One milestone per app or per workflow group, with done criteria including "old n8n workflow deactivated" and "48-hour bake passed". |
 | Phase 1 (Map) | Map each n8n workflow to its Hono route equivalent. Document the mapping. |
 | Phase 2 (Issue) | Write the route handler code. Identify what could break during switchover. |
 | Phase 3 (Execute) | Migrate one workflow, test, switch SPA, verify, deactivate n8n workflow. Repeat. |

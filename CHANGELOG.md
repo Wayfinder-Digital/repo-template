@@ -6,9 +6,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 ### Added
 - **GitLab mirror workflow**: `.github/workflows/mirror-to-gitlab.yml` — push-triggered Action that mirrors all branches and tags to `gitlab.com/wayfinder-digital/$REPO` using `GITLAB_MIRROR_TOKEN`
 - **`CHANGELOG-TEMPLATE.md`**: Starter changelog scaffold for new app repos created from this template
+- **`docs/project-brief.md`**: Phase Zero artifact template. Captures product, constraints, in/out-of-scope boundaries, architecture sketch, smallest useful version, boundary contracts, integration risks, and isolation test plan. Must be approved before any roadmap entries, issues, or code.
+- **`docs/milestones.md`**: Bridge between brief and roadmap. Each milestone groups roadmap entries (`vX.Y.0`) into a shippable user-visible slice with done criteria that reference brief boundary contracts, isolation tests, and integration risks.
 
 ### Changed
 - **README.md**: Setup steps updated to reference `CHANGELOG-TEMPLATE.md` so new repos start with a populated changelog
+- **`PROJECT_PROTOCOL.md`**: Phase Zero gate restored and strengthened. Added Phase 0 (Brief) with explicit prohibition on roadmap entries, GitHub issues, source code, and architecture decisions until `docs/project-brief.md` is approved. Added Phase 0.5 (Milestones) requiring approved milestone breakdown before any roadmap entry. Phase 2 (Issue) now requires brief revision when a feature introduces a new integration risk. Migration phase gates updated to require a branched brief (`docs/project-brief-v2.md`) for v2.0 work. Boot sequence updated to read brief and milestones. Brief gate applies to new repos and existing repos starting new major scope; not retroactive for established repos.
+- **`docs/roadmap.md`**: Header note added clarifying the file contains only approved, implementation-ready features. Each `vX.Y.0` template entry now requires a `**Milestone**` reference linking back to `docs/milestones.md`.
 
 ### Fixed
 - **GitLab mirror scope**: Workflow now mirrors only local branches and tags, not remote refs, preventing duplicate-ref push failures
